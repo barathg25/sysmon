@@ -1,0 +1,71 @@
+<Sysmon schemaversion="4.90">
+   <HashAlgorithms>MD5</HashAlgorithms>
+   <EventFiltering>
+      <!-- SYSMON EVENT ID 1: Process Creation -->
+      <ProcessCreate onmatch="include">
+         <Image condition="contains">mimikatz.exe</Image>
+         <Image condition="contains">powershell.exe</Image>
+      </ProcessCreate>
+
+      <!-- SYSMON EVENT ID 2: File Creation Time Changed -->
+      <FileCreateTime onmatch="include" />
+
+      <!-- SYSMON EVENT ID 3: Network Connection Logging (ENABLED) -->
+      <NetworkConnect onmatch="include">
+         <DestinationPort condition="contains">443</DestinationPort> <!-- Track HTTPS connections -->
+         <DestinationPort condition="contains">80</DestinationPort> <!-- Track HTTP connections -->
+         <Image condition="contains">chrome.exe</Image> <!-- Log browser activity -->
+         <Image condition="contains">firefox.exe</Image>
+         <Image condition="contains">powershell.exe</Image> <!-- Monitor suspicious PowerShell traffic -->
+      </NetworkConnect>
+
+      <!-- SYSMON EVENT ID 5: Process Termination -->
+      <ProcessTerminate onmatch="include" />
+
+      <!-- SYSMON EVENT ID 6: Driver Loaded -->
+      <DriverLoad onmatch="include" />
+
+      <!-- SYSMON EVENT ID 7: DLL (Image) Loaded -->
+      <ImageLoad onmatch="include" />
+
+      <!-- SYSMON EVENT ID 8: Remote Thread Created -->
+      <CreateRemoteThread onmatch="include">
+         <SourceImage condition="contains">mimikatz.exe</SourceImage>
+      </CreateRemoteThread>
+
+      <!-- SYSMON EVENT ID 9: Raw Disk Access (Used by Malware & Attackers) -->
+      <RawAccessRead onmatch="include" />
+
+      <!-- SYSMON EVENT ID 10: Process Access (Credential Dumping) -->
+      <ProcessAccess onmatch="include">
+         <SourceImage condition="contains">mimikatz.exe</SourceImage>
+      </ProcessAccess>
+
+      <!-- SYSMON EVENT ID 11: File Creation -->
+      <FileCreate onmatch="include" />
+
+      <!-- SYSMON EVENT ID 12, 13, 14: Registry Modification (USB Tracking) -->
+      <RegistryEvent onmatch="include">
+         <TargetObject condition="contains">\SYSTEM\CurrentControlSet\Enum\USB</TargetObject>
+      </RegistryEvent>
+
+      <!-- SYSMON EVENT ID 15: Alternate Data Stream Created -->
+      <FileCreateStreamHash onmatch="include" />
+
+      <!-- SYSMON EVENT ID 17: DNS Query Logging (Track Suspicious Requests) -->
+      <DnsQuery onmatch="include">
+         <QueryName condition="contains">malicious-site.com</QueryName>
+         <QueryName condition="contains">phishing-attack.com</QueryName>
+      </DnsQuery>
+
+      <!-- SYSMON EVENT ID 19: WMI Event Filters (Detect WMI-based Attacks) -->
+      <WmiEvent onmatch="include" />
+
+      <!-- SYSMON EVENT ID 22: File Delete (Monitor File Deletion) -->
+      <FileDelete onmatch="include" />
+
+      <!-- Named Pipes Monitoring (Detecting Lateral Movement) -->
+      <PipeEvent onmatch="include" />
+
+   </EventFiltering>
+</Sysmon>
